@@ -1,11 +1,1161 @@
-<!DOCTYPE html>
-<html>
-<head>
-  <meta charset="utf-8">
-  <title>我的 GitHub Pages 首页</title>
-</head>
-<body>
-  <h1>Hello, GitHub Pages!</h1>
-  <p>这是我的第一个静态网站。</p>
-</body>
-</html>
+import React, { useState } from 'react';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/card';
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts';
+import { CitationLink } from '@/components/ui/citation';
+import { Calendar, Newspaper, BookOpen, Rocket, Zap, Building2, TrendingUp, Lightbulb, Globe, Code, Cpu, LineChart } from 'lucide-react';
+
+// 引用数据
+const citations = {
+  1: {
+    title: "大模型强化学习新突破——SPO新范式助力大模型推理能力提升！",
+    url: "https://www.jiqizhixin.com/articles/98644f53-5e19-414c-9c27-10a344f914c8",
+    content: "关于Segment Policy Optimization的研究突破",
+    date: "2025-06-09",
+    siteName: "机器之心",
+    sourceContent: "大模型强化学习新突破——SPO新范式助力大模型推理能力提升！"
+  },
+  2: {
+    title: "开启端侧长文本时代！面壁全新架构，让小钢炮最快提升220倍",
+    url: "https://www.jiqizhixin.com/articles/dc0b3648-0e78-4836-b33e-11ce0dd22d5b",
+    content: "面壁智能发布MiniCPM 4.0，采用全新架构",
+    date: "2025-06-09",
+    siteName: "机器之心",
+    sourceContent: "开启端侧长文本时代！面壁全新架构，让小钢炮最快提升220倍"
+  },
+  3: {
+    title: "无需SFT也不用RL，样本级推理优化神器SLOT来了，准确率轻松+10%",
+    url: "https://www.jiqizhixin.com/articles/302ea8dd-bee6-4c1d-9087-88bb090d9200",
+    content: "西湖大学推出SLOT，一种样本级推理优化工具",
+    date: "2025-06-09",
+    siteName: "机器之心",
+    sourceContent: "无需SFT也不用RL，样本级推理优化神器SLOT来了，准确率轻松+10%"
+  },
+  4: {
+    title: "打破黑盒，构建信任：具身智能基础模型安全落地的系统挑战",
+    url: "https://www.jiqizhixin.com/articles/ea839e97-8dc0-4b90-8df0-ef96a493f999",
+    content: "关于具身智能基础模型安全落地的系统挑战研究",
+    date: "2025-06-09",
+    siteName: "机器之心",
+    sourceContent: "打破黑盒，构建信任：具身智能基础模型安全落地的系统挑战"
+  },
+  5: {
+    title: "中南大学开发DeepDTAGen：用于药物靶标亲和力预测和靶标感知药物生成的多任务深度学习框架",
+    url: "https://www.jiqizhixin.com/articles/054d71b2-a42a-4749-a7bd-2d2011c194fa",
+    content: "中南大学开发的DeepDTAGen框架用于药物研发",
+    date: "2025-06-09",
+    siteName: "机器之心",
+    sourceContent: "中南大学开发DeepDTAGen：用于药物靶标亲和力预测和靶标感知药物生成的多任务深度学习框架"
+  },
+  6: {
+    title: "训练仅8分钟，诊断仅需47毫秒，超轻量级肺癌诊断 AI 模型，无需GPU，个人笔记本可运行",
+    url: "https://www.jiqizhixin.com/articles/0ba4d3e0-4ab2-4d8c-bf72-b34e82c446cc",
+    content: "超轻量级肺癌诊断AI模型研发成功",
+    date: "2025-06-09",
+    siteName: "机器之心",
+    sourceContent: "训练仅8分钟，诊断仅需47毫秒，超轻量级肺癌诊断 AI 模型，无需GPU，个人笔记本可运行"
+  },
+  7: {
+    title: "华为昇腾万卡集群揭秘：如何驯服AI算力「巨兽」？",
+    url: "https://www.jiqizhixin.com/articles/f06804a4-32db-419b-aa29-57ba195fde3e",
+    content: "华为昇腾万卡集群技术解析",
+    date: "2025-06-09",
+    siteName: "机器之心",
+    sourceContent: "华为昇腾万卡集群揭秘：如何驯服AI算力「巨兽」？"
+  },
+  8: {
+    title: "质疑DeepSeek-R1、Claude Thinking根本不会推理！苹果争议论文翻车了？",
+    url: "https://www.jiqizhixin.com/articles/a738e27d-3fbb-4f57-a081-2aebd46dbf75",
+    content: "苹果发布的关于大模型推理能力的论文引发争议",
+    date: "2025-06-09",
+    siteName: "机器之心",
+    sourceContent: "质疑DeepSeek-R1、Claude Thinking根本不会推理！苹果争议论文翻车了？"
+  },
+  9: {
+    title: "CVPR 2025 Highlight｜AdaCM2：首个面向超长视频理解的跨模态自适应记忆压缩框架",
+    url: "https://www.jiqizhixin.com/articles/cef57e06-37f6-451e-aa93-1ca7c0068351",
+    content: "CVPR 2025上发布的AdaCM2框架用于超长视频理解",
+    date: "2025-06-09",
+    siteName: "机器之心",
+    sourceContent: "CVPR 2025 Highlight｜AdaCM2：首个面向超长视频理解的跨模态自适应记忆压缩框架"
+  },
+  10: {
+    title: "最新！Ilya现身多大毕业演讲：AI会完成我们能做的一切",
+    url: "https://www.jiqizhixin.com/articles/5f222731-e7eb-4d02-b89a-7f34f6e34e27",
+    content: "OpenAI联合创始人Ilya Sutskever在多伦多大学毕业演讲",
+    date: "2025-06-09",
+    siteName: "机器之心",
+    sourceContent: "最新！Ilya现身多大毕业演讲：AI会完成我们能做的一切"
+  },
+  11: {
+    title: "ICML Spotlight 2025丨追求概率质量的帕累托最优：基于广义α-β散度引导的知识蒸馏框架ABKD",
+    url: "https://www.jiqizhixin.com/articles/724e4bfe-1610-4ceb-b76c-6f899878e91a",
+    content: "ICML 2025上发布的ABKD知识蒸馏框架",
+    date: "2025-06-09",
+    siteName: "机器之心",
+    sourceContent: "ICML Spotlight 2025丨追求概率质量的帕累托最优：基于广义α-β散度引导的知识蒸馏框架ABKD"
+  },
+  12: {
+    title: "DrugCLIP：AI驱动超高通量虚拟筛选引擎，开启后AlphaFold时代创新药物发现新篇章",
+    url: "https://www.jiqizhixin.com/articles/724e4bfe-1610-4ceb-b76c-6f899878e91a",
+    content: "DrugCLIP用于药物发现的AI工具",
+    date: "2025-06-09",
+    siteName: "机器之心",
+    sourceContent: "DrugCLIP：AI驱动超高通量虚拟筛选引擎，开启后AlphaFold时代创新药物发现新篇章"
+  },
+  13: {
+    title: "Figma releases new AI-powered tools for creating sites, app prototypes, and marketing assets",
+    url: "https://techcrunch.com/2025/05/07/figma-releases-new-ai-powered-tools-for-creating-sites-app-prototypes-and-marketing-assets/",
+    content: "Figma发布新的AI驱动工具，用于创建网站、应用原型和营销资产",
+    date: "2025-05-07",
+    siteName: "TechCrunch",
+    sourceContent: "Figma releases new AI-powered tools for creating sites, app prototypes, and marketing assets"
+  },
+  14: {
+    title: "Meta launches a stand-alone AI app to compete with ChatGPT",
+    url: "https://techcrunch.com/2025/04/29/meta-launches-a-standalone-ai-app-to-compete-with-chatgpt/",
+    content: "Meta推出独立AI应用，与ChatGPT竞争",
+    date: "2025-04-29",
+    siteName: "TechCrunch",
+    sourceContent: "Meta launches a stand-alone AI app to compete with ChatGPT"
+  },
+  15: {
+    title: "OpenAI launches Codex, an AI coding agent, in ChatGPT",
+    url: "https://techcrunch.com/2025/05/16/openai-launches-codex-an-ai-coding-agent-in-chatgpt/",
+    content: "OpenAI在ChatGPT中推出AI编码代理Codex",
+    date: "2025-05-16",
+    siteName: "TechCrunch",
+    sourceContent: "OpenAI launches Codex, an AI coding agent, in ChatGPT"
+  },
+  16: {
+    title: "Quantifying the Benefit of Artificial Intelligence for Scientific Research",
+    url: "https://arxiv.org/abs/2304.10578",
+    content: "量化人工智能对科学研究的益处",
+    date: "2024-06-01",
+    siteName: "arXiv",
+    sourceContent: "Quantifying the Benefit of Artificial Intelligence for Scientific Research"
+  },
+  17: {
+    title: "Games for Artificial Intelligence Research: A Review and Perspectives",
+    url: "https://arxiv.org/abs/2304.13269",
+    content: "人工智能研究中的游戏：综述与展望",
+    date: "2024-06-04",
+    siteName: "arXiv",
+    sourceContent: "Games for Artificial Intelligence Research: A Review and Perspectives"
+  },
+  18: {
+    title: "谷歌公布「Contact Center AI」产品更新",
+    url: "https://www.jiqizhixin.com/trends/c7eecae1-35ea-4b9a-b125-8d29ee7f57f8",
+    content: "谷歌更新其Contact Center AI产品，提供改进的语音识别功能",
+    date: "2025-06-09",
+    siteName: "机器之心",
+    sourceContent: "谷歌于去年七月推出了一款名为「Contact Center AI」的人工智能产品，帮助企业从他们的联络中心获得更多有价值的东西。Contact Center AI 采用了谷歌的机器学习驱动工具，来帮助构建虚拟代理并帮助人工代理完成工作。该公司今日发布了几个该产品的更新，并表示将为该产品带来改进后的语音识别功能。"
+  },
+  19: {
+    title: "亚马逊 Innomedia 推出 BuddyTalk：内置 Alexa 的智能免提电话",
+    url: "https://www.jiqizhixin.com/trends/c7eecae1-35ea-4b9a-b125-8d29ee7f57f8",
+    content: "亚马逊推出内置Alexa的智能免提电话BuddyTalk",
+    date: "2025-06-09",
+    siteName: "机器之心",
+    sourceContent: "语音已经成为人们熟悉和方便地与家庭中的设备连接与控制的方式。目前，诸如控制灯，设置定时器和获取信息等任务都能通过语音控制实现。公司还会将语音体验带入工作场所，以提高会议室和办公人员的工作效率。今天，亚马逊正是宣布推出 BuddyTalk 系列，这是 Innomedia 为住宅，小型企业和企业用户提供的一系列白盒解决方案。"
+  },
+  20: {
+    title: "滴滴自动驾驶升级为独立公司，滴滴CTO张博兼任新公司CEO",
+    url: "https://www.jiqizhixin.com/trends/98a137f1-3430-4fb4-84c5-3775c0be9b68",
+    content: "滴滴出行宣布旗下自动驾驶部门升级为独立公司",
+    date: "2025-06-09",
+    siteName: "机器之心",
+    sourceContent: "8 月 5 日，滴滴出行宣布旗下自动驾驶部门升级为独立公司, 专注于自动驾驶研发、产品应用及相关业务拓展。滴滴出行 CTO 张博兼任自动驾驶新公司 CEO , 原顺为基金执行董事孟醒出任 COO，贾兆寅和郑建强分别担任美国研发团队和中国研发团队的负责人，三人均向张博汇报。"
+  }
+};
+
+// 模型更新数据
+const modelUpdates = [
+  { name: 'Qwen3-8B', company: '阿里云', date: '2025-06-09', features: '数学、代码生成和常识逻辑推理能力显著增强，创意写作、角色扮演和多轮对话表现出色' },
+  { name: 'gemma-3-4b-it', company: 'Google', date: '2025-06-09', features: '多模态模型，能处理文本和图像输入并生成文本输出，支持超过140种语言' },
+  { name: 'GLM-Z1-9B-0414', company: 'GLM团队', date: '2025-06-09', features: '轻量级9B版本，保持顶尖数学推理能力，为资源受限场景提供高效解决方案' },
+  { name: 'InternVL3-14B', company: 'InternVL', date: '2025-06-09', features: '多模态感知和推理能力更佳，涵盖工具使用、GUI智能体、工业图像分析、3D视觉感知等领域' },
+  { name: 'Qwen2.5-VL-7B-Instruct', company: '阿里云', date: '2025-06-09', features: '通过强化学习优化的新版本，图像细粒度理解、复杂数学推理等任务表现出色' },
+  { name: 'Phi-4-mini-instruct', company: 'Microsoft', date: '2025-06-09', features: '轻量级开放模型，基于合成数据和经过筛选的公开网站数据构建，专注于高质量、推理密集的数据' },
+  { name: 'Janus-Pro-7B', company: 'Janus', date: '2025-06-09', features: '基于DeepSeek-LLM构建，使用SigLIP-L作为视觉编码器，支持384x384图像输入' },
+  { name: 'DeepSeek-R1-Distill-Qwen-7B', company: 'DeepSeek', date: '2025-06-09', features: '通过大规模强化学习提升推理能力，与OpenAI-o1在数学、代码和推理任务上表现相当' }
+];
+
+// 研究突破数据
+const researchBreakthroughs = [
+  { title: 'SPO新范式', field: '强化学习', institution: '未知', impact: '助力大模型推理能力提升' },
+  { title: 'MiniCPM 4.0', field: '端侧模型', institution: '面壁智能', impact: '端侧长文本处理速度提升220倍' },
+  { title: 'SLOT', field: '推理优化', institution: '西湖大学', impact: '无需SFT和RL的样本级推理优化，准确率提升10%' },
+  { title: 'DeepDTAGen', field: '药物研发', institution: '中南大学', impact: '药物靶标亲和力预测和靶标感知药物生成的多任务深度学习框架' },
+  { title: '超轻量级肺癌诊断AI模型', field: '医疗诊断', institution: '未知', impact: '训练仅8分钟，诊断仅需47毫秒，无需GPU' },
+  { title: 'AdaCM2', field: '视频理解', institution: '未知', impact: '首个面向超长视频理解的跨模态自适应记忆压缩框架' },
+  { title: 'ABKD', field: '知识蒸馏', institution: '未知', impact: '基于广义α-β散度引导的知识蒸馏框架' },
+  { title: 'DrugCLIP', field: '药物发现', institution: '未知', impact: 'AI驱动超高通量虚拟筛选引擎，用于创新药物发现' }
+];
+
+// 产品发布数据
+const productReleases = [
+  { name: 'Codex', company: 'OpenAI', type: '编码助手', description: 'ChatGPT中的AI编码代理，由codex-1模型驱动，可处理多种软件工程任务' },
+  { name: 'Meta AI App', company: 'Meta', type: '独立AI应用', description: '独立AI应用，与ChatGPT竞争，可利用用户在Meta产品上分享的信息提供个性化响应' },
+  { name: 'Figma Sites & Make', company: 'Figma', type: '设计工具', description: 'AI驱动的网站和应用原型创建工具，可通过提示生成网站和应用原型' },
+  { name: 'Figma Buzz', company: 'Figma', type: '营销工具', description: '面向营销人员的工具，可使用设计师创建的品牌特定设计模板轻松创建新创意' },
+  { name: 'Figma Draw', company: 'Figma', type: '矢量编辑工具', description: '用于矢量编辑和插图的工具，添加了文本路径、图案填充、画笔等功能' },
+  { name: 'Contact Center AI更新', company: 'Google', type: '客服AI', description: '更新版本提供改进的语音识别功能，帮助企业构建虚拟代理' },
+  { name: 'BuddyTalk', company: '亚马逊', type: '智能设备', description: '内置Alexa的智能免提电话，为住宅、小型企业和企业用户提供语音控制解决方案' }
+];
+
+// 行业动态数据
+const industryNews = [
+  { title: 'Ilya Sutskever多伦多大学演讲', company: 'OpenAI', impact: '预测AI将完成人类能做的一切', category: '观点' },
+  { title: '苹果大模型推理能力论文引发争议', company: '苹果', impact: '质疑DeepSeek-R1、Claude Thinking的推理能力', category: '争议' },
+  { title: '华为昇腾万卡集群技术解析', company: '华为', impact: '揭秘如何管理大规模AI算力集群', category: '基础设施' },
+  { title: '滴滴自动驾驶升级为独立公司', company: '滴滴', impact: '专注于自动驾驶研发、产品应用及相关业务拓展', category: '企业动态' },
+  { title: '具身智能基础模型安全落地的系统挑战', company: '未知', impact: '探讨如何打破黑盒，构建可信任的具身智能系统', category: '安全' }
+];
+
+// 论文发布数据
+const paperReleases = [
+  { title: '量化人工智能对科学研究的益处', authors: '未知', journal: 'arXiv', date: '2024-06-01', field: '科学研究' },
+  { title: '人工智能研究中的游戏：综述与展望', authors: '未知', journal: 'arXiv', date: '2024-06-04', field: '游戏AI' }
+];
+
+// 图表数据
+const modelTypeData = [
+  { name: '多模态', value: 4 },
+  { name: '语言模型', value: 2 },
+  { name: '推理优化', value: 2 }
+];
+
+const researchFieldData = [
+  { name: '医疗健康', value: 2 },
+  { name: '推理优化', value: 3 },
+  { name: '多媒体处理', value: 1 },
+  { name: '知识蒸馏', value: 1 },
+  { name: '端侧计算', value: 1 }
+];
+
+const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#8884d8', '#82ca9d'];
+
+const AINewsReport = () => {
+  const [activeTab, setActiveTab] = useState('overview');
+  
+  const formatDate = () => {
+    const date = new Date();
+    return `${date.getFullYear()}年${date.getMonth() + 1}月${date.getDate()}日`;
+  };
+
+  return (
+    <div className="w-full max-w-7xl mx-auto p-4 bg-white dark:bg-gray-900">
+      <header className="mb-8 text-center">
+        <h1 className="text-3xl md:text-4xl font-bold mb-2 text-gray-900 dark:text-white">AI早报</h1>
+        <div className="flex items-center justify-center gap-2 text-gray-600 dark:text-gray-400">
+          <Calendar size={18} />
+          <p>{formatDate()}</p>
+        </div>
+        <div className="mt-4 max-w-3xl mx-auto">
+          <Alert className="bg-blue-50 dark:bg-blue-900/20 border-blue-200 dark:border-blue-800">
+            <Zap className="h-4 w-4" />
+            <AlertTitle>今日AI动态一览</AlertTitle>
+            <AlertDescription>
+              本日报汇总了最新的AI模型更新、研究突破、产品发布和行业动态，为您提供全面的AI领域最新进展。
+            </AlertDescription>
+          </Alert>
+        </div>
+      </header>
+
+      <div className="mb-8">
+        <div className="flex flex-col md:flex-row gap-4 mb-6">
+          <Card className="flex-1">
+            <CardHeader className="pb-2">
+              <CardTitle className="text-lg flex items-center gap-2">
+                <Cpu className="h-5 w-5 text-purple-500" />
+                <span>模型更新</span>
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <p className="text-sm text-gray-600 dark:text-gray-400">今日共有 {modelUpdates.length} 个大模型更新</p>
+            </CardContent>
+          </Card>
+          
+          <Card className="flex-1">
+            <CardHeader className="pb-2">
+              <CardTitle className="text-lg flex items-center gap-2">
+                <Lightbulb className="h-5 w-5 text-yellow-500" />
+                <span>研究突破</span>
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <p className="text-sm text-gray-600 dark:text-gray-400">今日共有 {researchBreakthroughs.length} 项研究突破</p>
+            </CardContent>
+          </Card>
+          
+          <Card className="flex-1">
+            <CardHeader className="pb-2">
+              <CardTitle className="text-lg flex items-center gap-2">
+                <Rocket className="h-5 w-5 text-blue-500" />
+                <span>产品发布</span>
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <p className="text-sm text-gray-600 dark:text-gray-400">今日共有 {productReleases.length} 款AI产品发布</p>
+            </CardContent>
+          </Card>
+        </div>
+      </div>
+
+      <div className="mb-8">
+        <div className="flex justify-center mb-6">
+          <div className="inline-flex h-10 items-center justify-center rounded-md bg-gray-100 dark:bg-gray-800 p-1">
+            <button 
+              className={`inline-flex items-center justify-center whitespace-nowrap rounded-sm px-3 py-1.5 text-sm font-medium ring-offset-white transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gray-950 focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 ${activeTab === 'overview' ? 'bg-white dark:bg-gray-950 text-gray-950 dark:text-gray-50 shadow-sm' : 'text-gray-500 dark:text-gray-400'}`}
+              onClick={() => setActiveTab('overview')}
+            >
+              <Globe className="mr-2 h-4 w-4" />
+              概览
+            </button>
+            <button 
+              className={`inline-flex items-center justify-center whitespace-nowrap rounded-sm px-3 py-1.5 text-sm font-medium ring-offset-white transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gray-950 focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 ${activeTab === 'models' ? 'bg-white dark:bg-gray-950 text-gray-950 dark:text-gray-50 shadow-sm' : 'text-gray-500 dark:text-gray-400'}`}
+              onClick={() => setActiveTab('models')}
+            >
+              <Cpu className="mr-2 h-4 w-4" />
+              模型更新
+            </button>
+            <button 
+              className={`inline-flex items-center justify-center whitespace-nowrap rounded-sm px-3 py-1.5 text-sm font-medium ring-offset-white transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gray-950 focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 ${activeTab === 'research' ? 'bg-white dark:bg-gray-950 text-gray-950 dark:text-gray-50 shadow-sm' : 'text-gray-500 dark:text-gray-400'}`}
+              onClick={() => setActiveTab('research')}
+            >
+              <BookOpen className="mr-2 h-4 w-4" />
+              研究突破
+            </button>
+            <button 
+              className={`inline-flex items-center justify-center whitespace-nowrap rounded-sm px-3 py-1.5 text-sm font-medium ring-offset-white transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gray-950 focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 ${activeTab === 'products' ? 'bg-white dark:bg-gray-950 text-gray-950 dark:text-gray-50 shadow-sm' : 'text-gray-500 dark:text-gray-400'}`}
+              onClick={() => setActiveTab('products')}
+            >
+              <Rocket className="mr-2 h-4 w-4" />
+              产品发布
+            </button>
+            <button 
+              className={`inline-flex items-center justify-center whitespace-nowrap rounded-sm px-3 py-1.5 text-sm font-medium ring-offset-white transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gray-950 focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 ${activeTab === 'industry' ? 'bg-white dark:bg-gray-950 text-gray-950 dark:text-gray-50 shadow-sm' : 'text-gray-500 dark:text-gray-400'}`}
+              onClick={() => setActiveTab('industry')}
+            >
+              <Building2 className="mr-2 h-4 w-4" />
+              行业动态
+            </button>
+          </div>
+        </div>
+
+        {activeTab === 'overview' && (
+          <div>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+              <Card>
+                <CardHeader>
+                  <CardTitle className="text-xl flex items-center gap-2">
+                    <TrendingUp className="h-5 w-5 text-green-500" />
+                    今日要闻
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <ul className="space-y-3">
+                    <li className="flex items-start gap-2">
+                      <div className="min-w-4 mt-1">
+                        <span className="inline-flex h-2 w-2 rounded-full bg-blue-500"></span>
+                      </div>
+                      <div>
+                        <p className="font-medium">OpenAI推出Codex编码代理<CitationLink id="15" callType="quote" citations={citations}/></p>
+                        <p className="text-sm text-gray-600 dark:text-gray-400">由codex-1模型驱动，可处理多种软件工程任务，已向ChatGPT Pro、Enterprise和Team用户开放</p>
+                      </div>
+                    </li>
+                    <li className="flex items-start gap-2">
+                      <div className="min-w-4 mt-1">
+                        <span className="inline-flex h-2 w-2 rounded-full bg-blue-500"></span>
+                      </div>
+                      <div>
+                        <p className="font-medium">面壁智能发布MiniCPM 4.0<CitationLink id="2" callType="quote" citations={citations}/></p>
+                        <p className="text-sm text-gray-600 dark:text-gray-400">采用全新架构，端侧长文本处理速度提升220倍</p>
+                      </div>
+                    </li>
+                    <li className="flex items-start gap-2">
+                      <div className="min-w-4 mt-1">
+                        <span className="inline-flex h-2 w-2 rounded-full bg-blue-500"></span>
+                      </div>
+                      <div>
+                        <p className="font-medium">西湖大学推出SLOT样本级推理优化工具<CitationLink id="3" callType="quote" citations={citations}/></p>
+                        <p className="text-sm text-gray-600 dark:text-gray-400">无需SFT和RL的样本级推理优化，准确率提升10%</p>
+                      </div>
+                    </li>
+                    <li className="flex items-start gap-2">
+                      <div className="min-w-4 mt-1">
+                        <span className="inline-flex h-2 w-2 rounded-full bg-blue-500"></span>
+                      </div>
+                      <div>
+                        <p className="font-medium">滴滴自动驾驶升级为独立公司<CitationLink id="20" callType="quote" citations={citations}/></p>
+                        <p className="text-sm text-gray-600 dark:text-gray-400">滴滴CTO张博兼任新公司CEO，专注于自动驾驶研发、产品应用及相关业务拓展</p>
+                      </div>
+                    </li>
+                    <li className="flex items-start gap-2">
+                      <div className="min-w-4 mt-1">
+                        <span className="inline-flex h-2 w-2 rounded-full bg-blue-500"></span>
+                      </div>
+                      <div>
+                        <p className="font-medium">Ilya Sutskever多伦多大学演讲<CitationLink id="10" callType="quote" citations={citations}/></p>
+                        <p className="text-sm text-gray-600 dark:text-gray-400">OpenAI联合创始人预测AI将完成人类能做的一切</p>
+                      </div>
+                    </li>
+                  </ul>
+                </CardContent>
+              </Card>
+
+              <Card>
+                <CardHeader>
+                  <CardTitle className="text-xl flex items-center gap-2">
+                    <LineChart className="h-5 w-5 text-purple-500" />
+                    AI研究趋势分析
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                      <h3 className="text-sm font-medium mb-2 text-center">模型类型分布</h3>
+                      <div className="h-[200px]">
+                        <ResponsiveContainer width="100%" height="100%">
+                          <PieChart>
+                            <Pie
+                              data={modelTypeData}
+                              cx="50%"
+                              cy="50%"
+                              labelLine={false}
+                              outerRadius={80}
+                              fill="#8884d8"
+                              dataKey="value"
+                              label={({name, percent}) => `${name} ${(percent * 100).toFixed(0)}%`}
+                            >
+                              {modelTypeData.map((entry, index) => (
+                                <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                              ))}
+                            </Pie>
+                            <Tooltip />
+                          </PieChart>
+                        </ResponsiveContainer>
+                      </div>
+                    </div>
+                    <div>
+                      <h3 className="text-sm font-medium mb-2 text-center">研究领域分布</h3>
+                      <div className="h-[200px]">
+                        <ResponsiveContainer width="100%" height="100%">
+                          <PieChart>
+                            <Pie
+                              data={researchFieldData}
+                              cx="50%"
+                              cy="50%"
+                              labelLine={false}
+                              outerRadius={80}
+                              fill="#8884d8"
+                              dataKey="value"
+                              label={({name, percent}) => `${name} ${(percent * 100).toFixed(0)}%`}
+                            >
+                              {researchFieldData.map((entry, index) => (
+                                <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                              ))}
+                            </Pie>
+                            <Tooltip />
+                          </PieChart>
+                        </ResponsiveContainer>
+                      </div>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
+
+            <Card className="mb-8">
+              <CardHeader>
+                <CardTitle className="text-xl flex items-center gap-2">
+                  <Code className="h-5 w-5 text-orange-500" />
+                  OpenAI推出Codex编码代理
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                  <div className="col-span-2">
+                    <p className="mb-4">
+                      OpenAI于5月16日宣布推出Codex研究预览版，这是该公司迄今为止最强大的AI编码代理<CitationLink id="15" callType="quote" citations={citations}/>。Codex由codex-1模型驱动，这是一个针对软件工程任务优化的o3 AI推理模型版本。OpenAI表示，codex-1生成的代码比o3更干净，更精确地遵循指令，并会迭代运行测试直到获得通过结果。
+                    </p>
+                    <p className="mb-4">
+                      Codex代理在云端的沙盒虚拟计算机中运行。通过与GitHub连接，Codex的环境可以预先加载用户的代码库。OpenAI表示，AI编码代理将花费1到30分钟的时间来编写简单功能、修复错误、回答关于代码库的问题并运行测试等任务。
+                    </p>
+                    <p>
+                      Codex目前正向ChatGPT Pro、Enterprise和Team订阅用户推出。OpenAI表示，用户一开始将有"慷慨的访问权限"，但在未来几周内，公司将对该工具实施速率限制。之后，用户将可以选择购买额外的积分来使用Codex。
+                    </p>
+                  </div>
+                  <div>
+                    <Card className="bg-gray-50 dark:bg-gray-800 border-0">
+                      <CardHeader className="pb-2">
+                        <CardTitle className="text-sm">Codex主要特点</CardTitle>
+                      </CardHeader>
+                      <CardContent className="pt-0">
+                        <ul className="space-y-2 text-sm">
+                          <li className="flex items-start gap-2">
+                            <div className="min-w-4 mt-1">
+                              <span className="inline-flex h-2 w-2 rounded-full bg-green-500"></span>
+                            </div>
+                            <p>由codex-1模型驱动，针对软件工程任务优化</p>
+                          </li>
+                          <li className="flex items-start gap-2">
+                            <div className="min-w-4 mt-1">
+                              <span className="inline-flex h-2 w-2 rounded-full bg-green-500"></span>
+                            </div>
+                            <p>可同时处理多个软件工程任务</p>
+                          </li>
+                          <li className="flex items-start gap-2">
+                            <div className="min-w-4 mt-1">
+                              <span className="inline-flex h-2 w-2 rounded-full bg-green-500"></span>
+                            </div>
+                            <p>在沙盒环境中运行，确保安全</p>
+                          </li>
+                          <li className="flex items-start gap-2">
+                            <div className="min-w-4 mt-1">
+                              <span className="inline-flex h-2 w-2 rounded-full bg-green-500"></span>
+                            </div>
+                            <p>可与GitHub集成，预加载代码库</p>
+                          </li>
+                          <li className="flex items-start gap-2">
+                            <div className="min-w-4 mt-1">
+                              <span className="inline-flex h-2 w-2 rounded-full bg-green-500"></span>
+                            </div>
+                            <p>用户可在Codex运行时继续使用计算机和浏览器</p>
+                          </li>
+                        </ul>
+                      </CardContent>
+                    </Card>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+        )}
+
+        {activeTab === 'models' && (
+          <div>
+            <Card className="mb-6">
+              <CardHeader>
+                <CardTitle className="text-xl">大模型更新一览</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="overflow-x-auto">
+                  <table className="w-full border-collapse">
+                    <thead>
+                      <tr className="border-b border-gray-200 dark:border-gray-700">
+                        <th className="text-left py-3 px-4 font-medium text-gray-600 dark:text-gray-300">模型名称</th>
+                        <th className="text-left py-3 px-4 font-medium text-gray-600 dark:text-gray-300">发布公司</th>
+                        <th className="text-left py-3 px-4 font-medium text-gray-600 dark:text-gray-300">发布日期</th>
+                        <th className="text-left py-3 px-4 font-medium text-gray-600 dark:text-gray-300">主要特点</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {modelUpdates.map((model, index) => (
+                        <tr key={index} className="border-b border-gray-200 dark:border-gray-700">
+                          <td className="py-3 px-4 font-medium">{model.name}</td>
+                          <td className="py-3 px-4 text-gray-600 dark:text-gray-400">{model.company}</td>
+                          <td className="py-3 px-4 text-gray-600 dark:text-gray-400">{model.date}</td>
+                          <td className="py-3 px-4 text-gray-600 dark:text-gray-400">{model.features}</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              </CardContent>
+            </Card>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <Card>
+                <CardHeader>
+                  <CardTitle>模型类型分布</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="h-[300px]">
+                    <ResponsiveContainer width="100%" height="100%">
+                      <PieChart>
+                        <Pie
+                          data={modelTypeData}
+                          cx="50%"
+                          cy="50%"
+                          labelLine={true}
+                          outerRadius={100}
+                          fill="#8884d8"
+                          dataKey="value"
+                          label={({name, percent}) => `${name}: ${(percent * 100).toFixed(0)}%`}
+                        >
+                          {modelTypeData.map((entry, index) => (
+                            <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                          ))}
+                        </Pie>
+                        <Tooltip />
+                        <Legend />
+                      </PieChart>
+                    </ResponsiveContainer>
+                  </div>
+                </CardContent>
+              </Card>
+
+              <Card>
+                <CardHeader>
+                  <CardTitle>模型发布公司分布</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="h-[300px]">
+                    <ResponsiveContainer width="100%" height="100%">
+                      <BarChart
+                        data={[
+                          { name: '阿里云', count: 2 },
+                          { name: 'Google', count: 1 },
+                          { name: 'GLM团队', count: 1 },
+                          { name: 'InternVL', count: 1 },
+                          { name: 'Microsoft', count: 1 },
+                          { name: 'Janus', count: 1 },
+                          { name: 'DeepSeek', count: 1 }
+                        ]}
+                        margin={{ top: 20, right: 30, left: 20, bottom: 5 }}
+                      >
+                        <CartesianGrid strokeDasharray="3 3" />
+                        <XAxis dataKey="name" />
+                        <YAxis />
+                        <Tooltip />
+                        <Bar dataKey="count" fill="#8884d8" name="模型数量" />
+                      </BarChart>
+                    </ResponsiveContainer>
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
+          </div>
+        )}
+
+        {activeTab === 'research' && (
+          <div>
+            <Card className="mb-6">
+              <CardHeader>
+                <CardTitle className="text-xl">研究突破一览</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="overflow-x-auto">
+                  <table className="w-full border-collapse">
+                    <thead>
+                      <tr className="border-b border-gray-200 dark:border-gray-700">
+                        <th className="text-left py-3 px-4 font-medium text-gray-600 dark:text-gray-300">研究名称</th>
+                        <th className="text-left py-3 px-4 font-medium text-gray-600 dark:text-gray-300">研究领域</th>
+                        <th className="text-left py-3 px-4 font-medium text-gray-600 dark:text-gray-300">研究机构</th>
+                        <th className="text-left py-3 px-4 font-medium text-gray-600 dark:text-gray-300">影响与意义</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {researchBreakthroughs.map((research, index) => (
+                        <tr key={index} className="border-b border-gray-200 dark:border-gray-700">
+                          <td className="py-3 px-4 font-medium">{research.title}</td>
+                          <td className="py-3 px-4 text-gray-600 dark:text-gray-400">{research.field}</td>
+                          <td className="py-3 px-4 text-gray-600 dark:text-gray-400">{research.institution}</td>
+                          <td className="py-3 px-4 text-gray-600 dark:text-gray-400">{research.impact}</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              </CardContent>
+            </Card>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <Card>
+                <CardHeader>
+                  <CardTitle>研究领域分布</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="h-[300px]">
+                    <ResponsiveContainer width="100%" height="100%">
+                      <PieChart>
+                        <Pie
+                          data={researchFieldData}
+                          cx="50%"
+                          cy="50%"
+                          labelLine={true}
+                          outerRadius={100}
+                          fill="#8884d8"
+                          dataKey="value"
+                          label={({name, percent}) => `${name}: ${(percent * 100).toFixed(0)}%`}
+                        >
+                          {researchFieldData.map((entry, index) => (
+                            <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                          ))}
+                        </Pie>
+                        <Tooltip />
+                        <Legend />
+                      </PieChart>
+                    </ResponsiveContainer>
+                  </div>
+                </CardContent>
+              </Card>
+
+              <Card>
+                <CardHeader>
+                  <CardTitle>最新论文发布</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <ul className="space-y-4">
+                    {paperReleases.map((paper, index) => (
+                      <li key={index} className="border-b border-gray-200 dark:border-gray-700 pb-4 last:border-0 last:pb-0">
+                        <h3 className="font-medium mb-1">{paper.title}</h3>
+                        <div className="text-sm text-gray-600 dark:text-gray-400 flex flex-wrap gap-x-4 gap-y-1">
+                          <span>发布日期: {paper.date}</span>
+                          <span>期刊: {paper.journal}</span>
+                          <span>领域: {paper.field}</span>
+                        </div>
+                      </li>
+                    ))}
+                  </ul>
+                </CardContent>
+              </Card>
+            </div>
+
+            <Card className="mt-6">
+              <CardHeader>
+                <CardTitle className="text-xl">研究亮点：SLOT样本级推理优化工具</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                  <div className="col-span-2">
+                    <p className="mb-4">
+                      西湖大学研究团队推出了一种名为SLOT的样本级推理优化工具<CitationLink id="3" callType="quote" citations={citations}/>，这是一种无需监督微调(SFT)和强化学习(RL)的推理优化方法。SLOT能够在推理阶段对大语言模型的输出进行优化，准确率提升高达10%。
+                    </p>
+                    <p className="mb-4">
+                      与传统的需要大量计算资源和时间的模型训练方法不同，SLOT直接在推理阶段对模型输出进行优化，大大降低了资源需求。这种方法特别适合于那些无法获得大量训练资源的研究者和开发者。
+                    </p>
+                    <p>
+                      SLOT的工作原理是在推理过程中对每个样本进行单独优化，而不是对整个模型进行全局优化。这种样本级的优化方法能够更精确地针对不同类型的输入进行调整，从而提高模型在各种任务上的表现。
+                    </p>
+                  </div>
+                  <div>
+                    <Card className="bg-gray-50 dark:bg-gray-800 border-0">
+                      <CardHeader className="pb-2">
+                        <CardTitle className="text-sm">SLOT主要优势</CardTitle>
+                      </CardHeader>
+                      <CardContent className="pt-0">
+                        <ul className="space-y-2 text-sm">
+                          <li className="flex items-start gap-2">
+                            <div className="min-w-4 mt-1">
+                              <span className="inline-flex h-2 w-2 rounded-full bg-green-500"></span>
+                            </div>
+                            <p>无需SFT和RL，降低计算资源需求</p>
+                          </li>
+                          <li className="flex items-start gap-2">
+                            <div className="min-w-4 mt-1">
+                              <span className="inline-flex h-2 w-2 rounded-full bg-green-500"></span>
+                            </div>
+                            <p>准确率提升高达10%</p>
+                          </li>
+                          <li className="flex items-start gap-2">
+                            <div className="min-w-4 mt-1">
+                              <span className="inline-flex h-2 w-2 rounded-full bg-green-500"></span>
+                            </div>
+                            <p>样本级优化，针对性更强</p>
+                          </li>
+                          <li className="flex items-start gap-2">
+                            <div className="min-w-4 mt-1">
+                              <span className="inline-flex h-2 w-2 rounded-full bg-green-500"></span>
+                            </div>
+                            <p>适用于各种大语言模型</p>
+                          </li>
+                          <li className="flex items-start gap-2">
+                            <div className="min-w-4 mt-1">
+                              <span className="inline-flex h-2 w-2 rounded-full bg-green-500"></span>
+                            </div>
+                            <p>实现简单，易于集成到现有系统</p>
+                          </li>
+                        </ul>
+                      </CardContent>
+                    </Card>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+        )}
+
+        {activeTab === 'products' && (
+          <div>
+            <Card className="mb-6">
+              <CardHeader>
+                <CardTitle className="text-xl">产品发布一览</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="overflow-x-auto">
+                  <table className="w-full border-collapse">
+                    <thead>
+                      <tr className="border-b border-gray-200 dark:border-gray-700">
+                        <th className="text-left py-3 px-4 font-medium text-gray-600 dark:text-gray-300">产品名称</th>
+                        <th className="text-left py-3 px-4 font-medium text-gray-600 dark:text-gray-300">发布公司</th>
+                        <th className="text-left py-3 px-4 font-medium text-gray-600 dark:text-gray-300">产品类型</th>
+                        <th className="text-left py-3 px-4 font-medium text-gray-600 dark:text-gray-300">产品描述</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {productReleases.map((product, index) => (
+                        <tr key={index} className="border-b border-gray-200 dark:border-gray-700">
+                          <td className="py-3 px-4 font-medium">{product.name}</td>
+                          <td className="py-3 px-4 text-gray-600 dark:text-gray-400">{product.company}</td>
+                          <td className="py-3 px-4 text-gray-600 dark:text-gray-400">{product.type}</td>
+                          <td className="py-3 px-4 text-gray-600 dark:text-gray-400">{product.description}</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              </CardContent>
+            </Card>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <Card>
+                <CardHeader>
+                  <CardTitle>产品类型分布</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="h-[300px]">
+                    <ResponsiveContainer width="100%" height="100%">
+                      <BarChart
+                        data={[
+                          { name: '编码助手', count: 1 },
+                          { name: '独立AI应用', count: 1 },
+                          { name: '设计工具', count: 1 },
+                          { name: '营销工具', count: 1 },
+                          { name: '矢量编辑工具', count: 1 },
+                          { name: '客服AI', count: 1 },
+                          { name: '智能设备', count: 1 }
+                        ]}
+                        margin={{ top: 20, right: 30, left: 20, bottom: 5 }}
+                      >
+                        <CartesianGrid strokeDasharray="3 3" />
+                        <XAxis dataKey="name" />
+                        <YAxis />
+                        <Tooltip />
+                        <Bar dataKey="count" fill="#00C49F" name="产品数量" />
+                      </BarChart>
+                    </ResponsiveContainer>
+                  </div>
+                </CardContent>
+              </Card>
+
+              <Card>
+                <CardHeader>
+                  <CardTitle>发布公司分布</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="h-[300px]">
+                    <ResponsiveContainer width="100%" height="100%">
+                      <BarChart
+                        data={[
+                          { name: 'OpenAI', count: 1 },
+                          { name: 'Meta', count: 1 },
+                          { name: 'Figma', count: 3 },
+                          { name: 'Google', count: 1 },
+                          { name: '亚马逊', count: 1 }
+                        ]}
+                        margin={{ top: 20, right: 30, left: 20, bottom: 5 }}
+                      >
+                        <CartesianGrid strokeDasharray="3 3" />
+                        <XAxis dataKey="name" />
+                        <YAxis />
+                        <Tooltip />
+                        <Bar dataKey="count" fill="#FFBB28" name="产品数量" />
+                      </BarChart>
+                    </ResponsiveContainer>
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
+
+            <Card className="mt-6">
+              <CardHeader>
+                <CardTitle className="text-xl">产品亮点：Figma AI设计工具套件</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                  <div className="col-span-2">
+                    <p className="mb-4">
+                      设计公司Figma于5月7日宣布推出多项AI驱动的功能<CitationLink id="13" callType="quote" citations={citations}/>，包括AI驱动的网站和Web应用创建工具、面向营销人员的资产创建工具以及新的绘图工具。通过这次发布，Figma正在与其他创意解决方案如Canva和Adobe竞争，同时也与AI驱动的网站和原型创建工具如WordPress、Wix、Hostinger和Replit展开竞争。
+                    </p>
+                    <p className="mb-4">
+                      Figma的网站创建工具名为Figma Sites。该工具允许设计师轻松创建网站并发布它们。一旦生成网站，协作者可以通过编辑器轻松更改网站元素，而无需提示。用户还可以添加过渡、动画和滚动效果，同时使网站具有响应性。
+                    </p>
+                    <p className="mb-4">
+                      另一方面，Figma Make是一个类似的AI驱动工具，更侧重于构思和原型设计。用户可以输入提示来创建Web应用程序。原型应用是协作式的，用户可以提示助手更改或添加某些元素。此外，如果团队中有开发人员，他们可以直接修改代码进行必要的更改。
+                    </p>
+                    <p>
+                      此外，Figma还为营销人员推出了Figma Buzz工具。使用这些工具，营销人员可以轻松使用设计师创建的品牌特定设计模板来制作新创意。他们还可以使用工具插入AI生成的图像或更改某些资产的背景。营销人员还可以使用来自电子表格等来源的数据批量创建资产。
+                    </p>
+                  </div>
+                  <div>
+                    <Card className="bg-gray-50 dark:bg-gray-800 border-0 mb-4">
+                      <CardHeader className="pb-2">
+                        <CardTitle className="text-sm">Figma Sites特点</CardTitle>
+                      </CardHeader>
+                      <CardContent className="pt-0">
+                        <ul className="space-y-2 text-sm">
+                          <li className="flex items-start gap-2">
+                            <div className="min-w-4 mt-1">
+                              <span className="inline-flex h-2 w-2 rounded-full bg-blue-500"></span>
+                            </div>
+                            <p>AI驱动的网站创建与发布</p>
+                          </li>
+                          <li className="flex items-start gap-2">
+                            <div className="min-w-4 mt-1">
+                              <span className="inline-flex h-2 w-2 rounded-full bg-blue-500"></span>
+                            </div>
+                            <p>无需提示即可编辑网站元素</p>
+                          </li>
+                          <li className="flex items-start gap-2">
+                            <div className="min-w-4 mt-1">
+                              <span className="inline-flex h-2 w-2 rounded-full bg-blue-500"></span>
+                            </div>
+                            <p>支持过渡、动画和滚动效果</p>
+                          </li>
+                          <li className="flex items-start gap-2">
+                            <div className="min-w-4 mt-1">
+                              <span className="inline-flex h-2 w-2 rounded-full bg-blue-500"></span>
+                            </div>
+                            <p>内置CMS系统，支持博客发布</p>
+                          </li>
+                        </ul>
+                      </CardContent>
+                    </Card>
+                    
+                    <Card className="bg-gray-50 dark:bg-gray-800 border-0">
+                      <CardHeader className="pb-2">
+                        <CardTitle className="text-sm">Figma Make特点</CardTitle>
+                      </CardHeader>
+                      <CardContent className="pt-0">
+                        <ul className="space-y-2 text-sm">
+                          <li className="flex items-start gap-2">
+                            <div className="min-w-4 mt-1">
+                              <span className="inline-flex h-2 w-2 rounded-full bg-purple-500"></span>
+                            </div>
+                            <p>通过提示创建Web应用原型</p>
+                          </li>
+                          <li className="flex items-start gap-2">
+                            <div className="min-w-4 mt-1">
+                              <span className="inline-flex h-2 w-2 rounded-full bg-purple-500"></span>
+                            </div>
+                            <p>协作式原型设计</p>
+                          </li>
+                          <li className="flex items-start gap-2">
+                            <div className="min-w-4 mt-1">
+                              <span className="inline-flex h-2 w-2 rounded-full bg-purple-500"></span>
+                            </div>
+                            <p>支持直接代码修改</p>
+                          </li>
+                          <li className="flex items-start gap-2">
+                            <div className="min-w-4 mt-1">
+                              <span className="inline-flex h-2 w-2 rounded-full bg-purple-500"></span>
+                            </div>
+                            <p>可生成小型交互元素</p>
+                          </li>
+                        </ul>
+                      </CardContent>
+                    </Card>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+        )}
+
+        {activeTab === 'industry' && (
+          <div>
+            <Card className="mb-6">
+              <CardHeader>
+                <CardTitle className="text-xl">行业动态一览</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="overflow-x-auto">
+                  <table className="w-full border-collapse">
+                    <thead>
+                      <tr className="border-b border-gray-200 dark:border-gray-700">
+                        <th className="text-left py-3 px-4 font-medium text-gray-600 dark:text-gray-300">动态标题</th>
+                        <th className="text-left py-3 px-4 font-medium text-gray-600 dark:text-gray-300">相关公司</th>
+                        <th className="text-left py-3 px-4 font-medium text-gray-600 dark:text-gray-300">影响与意义</th>
+                        <th className="text-left py-3 px-4 font-medium text-gray-600 dark:text-gray-300">类别</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {industryNews.map((news, index) => (
+                        <tr key={index} className="border-b border-gray-200 dark:border-gray-700">
+                          <td className="py-3 px-4 font-medium">{news.title}</td>
+                          <td className="py-3 px-4 text-gray-600 dark:text-gray-400">{news.company}</td>
+                          <td className="py-3 px-4 text-gray-600 dark:text-gray-400">{news.impact}</td>
+                          <td className="py-3 px-4 text-gray-600 dark:text-gray-400">{news.category}</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              </CardContent>
+            </Card>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <Card>
+                <CardHeader>
+                  <CardTitle>行业动态类别分布</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="h-[300px]">
+                    <ResponsiveContainer width="100%" height="100%">
+                      <PieChart>
+                        <Pie
+                          data={[
+                            { name: '观点', value: 1 },
+                            { name: '争议', value: 1 },
+                            { name: '基础设施', value: 1 },
+                            { name: '企业动态', value: 1 },
+                            { name: '安全', value: 1 }
+                          ]}
+                          cx="50%"
+                          cy="50%"
+                          labelLine={true}
+                          outerRadius={100}
+                          fill="#8884d8"
+                          dataKey="value"
+                          label={({name, percent}) => `${name}: ${(percent * 100).toFixed(0)}%`}
+                        >
+                          {[0, 1, 2, 3, 4].map((index) => (
+                            <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                          ))}
+                        </Pie>
+                        <Tooltip />
+                        <Legend />
+                      </PieChart>
+                    </ResponsiveContainer>
+                  </div>
+                </CardContent>
+              </Card>
+
+              <Card>
+                <CardHeader>
+                  <CardTitle>相关公司分布</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="h-[300px]">
+                    <ResponsiveContainer width="100%" height="100%">
+                      <BarChart
+                        data={[
+                          { name: 'OpenAI', count: 1 },
+                          { name: '苹果', count: 1 },
+                          { name: '华为', count: 1 },
+                          { name: '滴滴', count: 1 },
+                          { name: '其他', count: 1 }
+                        ]}
+                        margin={{ top: 20, right: 30, left: 20, bottom: 5 }}
+                      >
+                        <CartesianGrid strokeDasharray="3 3" />
+                        <XAxis dataKey="name" />
+                        <YAxis />
+                        <Tooltip />
+                        <Bar dataKey="count" fill="#FF8042" name="动态数量" />
+                      </BarChart>
+                    </ResponsiveContainer>
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
+
+            <Card className="mt-6">
+              <CardHeader>
+                <CardTitle className="text-xl">行业亮点：Ilya Sutskever多伦多大学演讲</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                  <div className="col-span-2">
+                    <p className="mb-4">
+                      OpenAI联合创始人Ilya Sutskever近日在多伦多大学毕业典礼上发表演讲<CitationLink id="10" callType="quote" citations={citations}/>，他在演讲中表示，人工智能将最终能够完成人类能做的一切任务。这一观点引发了广泛讨论，尤其是在当前AI技术快速发展的背景下。
+                    </p>
+                    <p className="mb-4">
+                      作为OpenAI的核心人物之一，Sutskever的观点被视为对AI未来发展的重要预测。他强调，AI技术的进步速度远超许多人的预期，这种快速发展将持续改变各个行业和人们的生活方式。
+                    </p>
+                    <p>
+                      Sutskever的演讲也引发了关于AI伦理和监管的讨论。随着AI能力的不断增强，如何确保这些技术的安全发展和负责任使用成为越来越重要的话题。这也与OpenAI一直强调的"安全、有益的通用人工智能"的使命相呼应。
+                    </p>
+                  </div>
+                  <div>
+                    <Card className="bg-gray-50 dark:bg-gray-800 border-0">
+                      <CardHeader className="pb-2">
+                        <CardTitle className="text-sm">演讲要点</CardTitle>
+                      </CardHeader>
+                      <CardContent className="pt-0">
+                        <ul className="space-y-2 text-sm">
+                          <li className="flex items-start gap-2">
+                            <div className="min-w-4 mt-1">
+                              <span className="inline-flex h-2 w-2 rounded-full bg-yellow-500"></span>
+                            </div>
+                            <p>AI将最终能够完成人类能做的一切任务</p>
+                          </li>
+                          <li className="flex items-start gap-2">
+                            <div className="min-w-4 mt-1">
+                              <span className="inline-flex h-2 w-2 rounded-full bg-yellow-500"></span>
+                            </div>
+                            <p>AI技术进步速度远超预期</p>
+                          </li>
+                          <li className="flex items-start gap-2">
+                            <div className="min-w-4 mt-1">
+                              <span className="inline-flex h-2 w-2 rounded-full bg-yellow-500"></span>
+                            </div>
+                            <p>强调AI安全和负责任使用的重要性</p>
+                          </li>
+                          <li className="flex items-start gap-2">
+                            <div className="min-w-4 mt-1">
+                              <span className="inline-flex h-2 w-2 rounded-full bg-yellow-500"></span>
+                            </div>
+                            <p>AI将持续改变各行业和生活方式</p>
+                          </li>
+                          <li className="flex items-start gap-2">
+                            <div className="min-w-4 mt-1">
+                              <span className="inline-flex h-2 w-2 rounded-full bg-yellow-500"></span>
+                            </div>
+                            <p>呼吁年轻一代积极参与AI发展</p>
+                          </li>
+                        </ul>
+                      </CardContent>
+                    </Card>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+        )}
+      </div>
+
+      <footer className="mt-12 border-t border-gray-200 dark:border-gray-800 pt-6 text-center text-gray-600 dark:text-gray-400">
+        <p className="mb-2">AI早报 - {formatDate()}</p>
+        <div className="flex justify-center gap-4 mb-4">
+          <span className="text-sm flex items-center gap-1">
+            <Newspaper size={14} />
+            新闻来源：机器之心、TechCrunch等
+          </span>
+          <span className="text-sm flex items-center gap-1">
+            <BookOpen size={14} />
+            论文来源：arXiv
+          </span>
+        </div>
+        <Card className="w-full">
+          <CardContent className="text-xs sm:text-sm text-muted-foreground mt-2 sm:mt-4 p-3 sm:p-6">
+            <p className="font-semibold">参考资料：</p>
+            <ul className="space-y-1 mt-2">
+              {Object.entries(citations).map(([id, citation]) => (
+                <li key={id}>
+                  <CitationLink id={id} callType={"recommend"} citations={citations}/>
+                </li>
+              ))}
+            </ul>
+          </CardContent>
+        </Card>
+      </footer>
+    </div>
+  );
+};
+
+export default AINewsReport;
